@@ -13,6 +13,8 @@ enum Degree
   SOFTWARE
 };
 
+const string degreeStrings[] = {"SECURITY", "NETWORK", "SOFTWARE"};
+
 ///////////Student////////////
 #pragma region Student
 class Student
@@ -36,9 +38,9 @@ public:
   virtual void print()
   {
 
-    cout << studentId << endl;
-    cout << firstName << endl;
-    cout << lastName << endl;
+    cout << studentId << '\n';
+    cout << firstName << '\n';
+    cout << lastName << '\n';
     return;
   }
 
@@ -87,7 +89,7 @@ public:
   void print()
   {
     this->Student::print();
-    cout << "SECURITY" << endl;
+    cout << "SECURITY" << '\n';
   }
 };
 #pragma endregion
@@ -98,20 +100,36 @@ class Roster
 {
 
 public:
-  void add(string studentID, string firstName, string lastName, string degree)
+  ~Roster() {}
+  Roster() { currentPosition = -1; }
+  void add(string studentID, string firstName, string lastName, Degree degree)
   {
     Student *student;
 
-    if ("SECURITY" == degree)
+    if (SECURITY == degree)
+    {
       student = new SecurityStudent();
+    }
+    else if (NETWORK == degree)
+    {
+      student = new SecurityStudent();
+    }
+    else if (SECURITY == degree)
+    {
+      student = new SecurityStudent();
+    }
+    else
+    {
+      std::cout << "Failed to set degree type for: " << studentID << '\n';
+      return;
+    }
 
     student->setStudentId(studentID);
     student->setFirstName(firstName);
     student->setLastName(lastName);
-    student->setLastName(lastName);
 
     currentPosition += 1;
-    classRosterArray[currentPosition] = *student;
+    classRosterArray[currentPosition] = student;
   }
   void printByDegreeProgram(Degree aDegree)
   {
@@ -119,44 +137,39 @@ public:
     bool studentFound = false;
     int studentIndex = 0;
 
-    for (int i = 0; i < currentPosition; i += 1)
+    cout << "Show students with " << degreeStrings[aDegree] << " degree: " << '\n';
+    for (int i = 0; i < currentPosition + 1; i += 1)
     {
-      if (classRosterArray[i].getDegreeProgram() == aDegree)
+      if (classRosterArray[i]->getDegreeProgram() == aDegree)
       {
+        cout << "Student " << classRosterArray[i]->getFirstName() << " " << '\n';
         studentFound = true;
-        studentIndex = i;
       }
     }
 
-    std::cout << "Show students with " << aDegree << "degree: " << endl;
-    if (studentFound)
-    {
-
-      cout << "Student " << classRosterArray[studentIndex].getFirstName() << " " << endl;
-    }
-    else
+    if (!studentFound)
     {
       // expected: the above line should print a message saying such a student with this ID was not found.
-      std::cout << "Such a student with this ID was not found. 🤷‍♂️" << endl
-                << endl;
+      cout << "No students found. 🤷‍♂️" << '\n'
+           << '\n';
     }
   }
 
 private:
-  Student classRosterArray[ROSTER_SIZE];
-  int currentPosition = 0;
+  Student *classRosterArray[ROSTER_SIZE];
+  int currentPosition;
 };
 #pragma endregion
 
 int main()
 {
-  // const string studentData[] =
-  //     {"A1,John,Smith,John1989@gm ail.com,20,30,35,40,SECURITY",
-  //      "A2,Suzan,Erickson,Erickson_1990@gmailcom,19,50,30,40,NETWORK",
-  //      "A3,Jack,Napoli,The_lawyer99yahoo.com,19,20,40,33,SOFTWARE",
-  //      "A4,Erin,Black,Erin.black@comcast.net,22,50,58,40,SECURITY"};
+  const string studentData[] =
+      {"A1,John,Smith,John1989@gm ail.com,20,30,35,40,SECURITY",
+       "A2,Suzan,Erickson,Erickson_1990@gmailcom,19,50,30,40,SECURITY",
+       "A3,Jack,Napoli,The_lawyer99yahoo.com,19,20,40,33,SECURITY",
+       "A4,Erin,Black,Erin.black@comcast.net,22,50,58,40,SECURITY"};
 
-  const string studentData[] = {"A1,John,Smith,John1989@gm ail.com,20,30,35,40,SECURITY"};
+  // const string studentData[] = {"A3,Jack,Napoli,The_lawyer99yahoo.com,19,20,40,33,SOFTWARE"};
 
   // Create an instance of the Roster class called classRoster.
   Roster classRoster;
@@ -167,6 +180,7 @@ int main()
   {
     string singleStudentData[MAX_ATRIBUTES];
     int i = -1;
+    Degree degreeType;
 
     istringstream ss(student);
     while (!ss.eof())
@@ -177,16 +191,29 @@ int main()
       singleStudentData[i] = x;
     }
 
-    // TODO: convert degree to enum and pass into pass Roster.add()
+    // check degree type
+    if ("SECURITY" == singleStudentData[8])
+    {
+      degreeType = SECURITY;
+    }
+    else if ("NETWORK" == singleStudentData[8])
+    {
+      degreeType = NETWORK;
+    }
+    else if ("SOFTWARE" == singleStudentData[8])
+    {
+      degreeType = SOFTWARE;
+    }
+
     classRoster.add(
         singleStudentData[0], // student id
         singleStudentData[1], // fname
         singleStudentData[2], // lname
-        singleStudentData[8]  // degree
+        degreeType            // degree
     );
   } // END loop through studentData[]
 
-  classRoster.printByDegreeProgram(SOFTWARE);
+  classRoster.printByDegreeProgram(SECURITY);
 
   return 0;
 }
